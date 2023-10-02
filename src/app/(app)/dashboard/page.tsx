@@ -1,4 +1,5 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import Dashboard from "@web/components/Dashboard";
 import { db } from "@web/db";
 import { redirect } from "next/navigation";
 
@@ -23,5 +24,5 @@ export default async function Home() {
     }
 
     // If everything is fine, we can show the dashboard
-    return <div>Dashboard</div>;
+    return <Dashboard />;
 }
