@@ -1,9 +1,11 @@
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import {
+    RegisterLink,
+    getKindeServerSession,
+} from "@kinde-oss/kinde-auth-nextjs/server";
 import MaxWidthWrapper from "@web/components/MaxWidthWrapper";
 import { buttonVariants } from "@web/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default function Home() {
@@ -29,17 +31,14 @@ export default function Home() {
                 <p className="mt-5 max-w-prose text-zinc-700 sm:text-lg">
                     {"Huddl allows you to code. Just don't leetcode."}
                 </p>
-
-                <Link
+                <RegisterLink
                     className={buttonVariants({
                         size: "lg",
                         className: "mt-5",
                     })}
-                    href="/dashboard"
-                    target="_blank"
                 >
-                    Join Wailist <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
+                    Join Waitlist <ArrowRight className="ml-2 h-5 w-5" />
+                </RegisterLink>
             </MaxWidthWrapper>
 
             <div className="mb-20">
