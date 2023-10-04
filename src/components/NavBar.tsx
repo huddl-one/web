@@ -5,6 +5,7 @@ import {
 } from "@kinde-oss/kinde-auth-nextjs/server";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { ModeToggle } from "./ThemeToggle";
 import UserAccountNav from "./UserAccountNav";
 import WidthWrapper from "./WidthWrapper";
 import { buttonVariants } from "./ui/button";
@@ -21,6 +22,7 @@ const Navbar = () => {
                         <span className="text-xl px-3">huddl.</span>
                     </Link>
                     <div className="hidden items-center space-x-4 sm:flex">
+                        <ModeToggle />
                         {!user ? (
                             <>
                                 {/* <Link

@@ -29,7 +29,7 @@ export function RightSidebar({ className }: SidebarProps) {
                         <CardTitle className="font-semibold tracking-tight">
                             Start a Contest
                         </CardTitle>
-                        <Trophy className="h-4 w-4 text-muted-foreground" />
+                        <Trophy className="h-4 w-4 text-primary" />
                     </CardHeader>
                     <CardContent className="pb-4">
                         <p className="text-xs text-muted-foreground">
@@ -62,34 +62,10 @@ export function RightSidebar({ className }: SidebarProps) {
                     <CardFooter>
                         <Button
                             className="px-3 py-2 flex items-center w-full"
-                            variant={"outline"}
+                            variant={"secondary"}
                         >
                             <h2 className="px-4 font-semibold tracking-tight">
                                 Register
-                            </h2>
-                        </Button>
-                    </CardFooter>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="font-semibold tracking-tight">
-                            Chatbot Assistant
-                        </CardTitle>
-                        <BrainCircuit className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent className="pb-4">
-                        <p className="text-xs text-muted-foreground">
-                            A revoultionary AI assistant to help you with your
-                            coding problems!!
-                        </p>
-                    </CardContent>
-                    <CardFooter>
-                        <Button
-                            className="px-3 py-2 flex items-center w-full disabled"
-                            variant={"outline"}
-                        >
-                            <h2 className="px-4 font-semibold tracking-tight">
-                                Coming soon...
                             </h2>
                         </Button>
                     </CardFooter>
@@ -109,10 +85,35 @@ export function RightSidebar({ className }: SidebarProps) {
                     <CardFooter>
                         <Button
                             className="px-3 py-2 flex items-center w-full"
-                            variant={"outline"}
+                            variant={"secondary"}
                         >
                             <h2 className="px-4 font-semibold tracking-tight">
                                 Contribute
+                            </h2>
+                        </Button>
+                    </CardFooter>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="font-semibold tracking-tight">
+                            Chatbot Assistant
+                        </CardTitle>
+                        <BrainCircuit className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent className="pb-4">
+                        <p className="text-xs text-muted-foreground">
+                            A revoultionary AI assistant to help you with your
+                            coding problems!!
+                        </p>
+                    </CardContent>
+                    <CardFooter>
+                        <Button
+                            disabled
+                            className="px-3 py-2 flex items-center w-full"
+                            variant={"outline"}
+                        >
+                            <h2 className="px-4 font-semibold tracking-tight">
+                                Coming soon...
                             </h2>
                         </Button>
                     </CardFooter>

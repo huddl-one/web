@@ -78,7 +78,7 @@ export function LeftSidebar({ className, channels }: SidebarProps) {
                     <h2 className="relative px-7 text-lg font-semibold tracking-tight">
                         Channels
                     </h2>
-                    <ScrollArea className="h-[300px] px-1">
+                    <ScrollArea className="max-h-[300px] px-1">
                         <div className="space-y-1 p-2">
                             {channels?.map((channel, i) => (
                                 <Link
