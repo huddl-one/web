@@ -157,7 +157,7 @@ const Dashboard = () => {
                             <CardTitle className="text-sm font-medium">
                                 Problems Solved
                             </CardTitle>
-                            <Award className="h-4 w-4 text-muted-foreground" />
+                            <Award className="h-4 w-4 text-primary" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">169</div>
@@ -171,7 +171,7 @@ const Dashboard = () => {
                             <CardTitle className="text-sm font-medium">
                                 Accepted Rate
                             </CardTitle>
-                            <PartyPopper className="h-4 w-4 text-muted-foreground" />
+                            <PartyPopper className="h-4 w-4 text-primary" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">80%</div>
@@ -185,7 +185,7 @@ const Dashboard = () => {
                             <CardTitle className="text-sm font-medium">
                                 Contests
                             </CardTitle>
-                            <Trophy className="h-4 w-4 text-muted-foreground" />
+                            <Trophy className="h-4 w-4 text-primary" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">16</div>
@@ -199,7 +199,7 @@ const Dashboard = () => {
                             <CardTitle className="text-sm font-medium">
                                 Streak
                             </CardTitle>
-                            <Flame className="h-4 w-4 text-muted-foreground" />
+                            <Flame className="h-4 w-4 text-primary" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">3 days</div>

@@ -1,6 +1,13 @@
 "use client";
 
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import {
+    Bar,
+    BarChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from "recharts";
 
 const data = [
     {
@@ -41,6 +48,42 @@ const data = [
     },
 ];
 
+export const CustomTooltip = ({
+    active,
+    payload,
+    label,
+}: {
+    active?: any;
+    payload?: any;
+    label?: any;
+}) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-secondary/75 rounded p-3">
+                {/* <p className="label">{`${label} : ${payload[0].value}`}</p> */}
+                <div>
+                    {payload.map((pld: any) => (
+                        <div
+                            key={pld}
+                            className="flex items-center justify-between gap-2"
+                        >
+                            <div>{pld.value}</div>
+                            <div
+                                className="capitalize"
+                                style={{ color: pld.fill }}
+                            >
+                                {pld.dataKey}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    return null;
+};
+
 export function Overview() {
     return (
         <ResponsiveContainer width="100%" height={350}>
@@ -59,22 +102,26 @@ export function Overview() {
                     axisLine={false}
                     tickFormatter={(value) => `${value}`}
                 />
+                <Tooltip
+                    content={<CustomTooltip />}
+                    cursor={{ fill: "transparent" }}
+                />
                 <Bar
                     stackId={"a"}
                     dataKey="easy"
-                    fill="#D8FCD9"
+                    fill="#8E53E6"
                     radius={[4, 4, 0, 0]}
                 />
                 <Bar
                     stackId={"a"}
                     dataKey="med"
-                    fill="#FFFDE7"
+                    fill="#6D27D9"
                     radius={[4, 4, 0, 0]}
                 />
                 <Bar
                     stackId={"a"}
                     dataKey="hard"
-                    fill="#FFD6A5"
+                    fill="#5122A7"
                     radius={[4, 4, 0, 0]}
                 />
             </BarChart>

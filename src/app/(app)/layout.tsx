@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
     return (
         <WidthWrapper>
-            <main className="grid grid-cols-5 gap-8">
+            <main className="hidden 2xl:grid grid-cols-5 gap-8">
                 <LeftSidebar
                     channels={[
                         {
@@ -25,6 +25,20 @@ export default function RootLayout({
                 />
                 {children}
                 <RightSidebar />
+            </main>
+            <main className="grid grid-cols-5 lg:grid-cols-4 gap-8 2xl:hidden">
+                <section className="col-span-2 lg:col-span-1">
+                    <LeftSidebar
+                        channels={[
+                            {
+                                name: "General",
+                                id: "general",
+                            },
+                        ]}
+                    />
+                    <RightSidebar />
+                </section>
+                {children}
             </main>
         </WidthWrapper>
     );
