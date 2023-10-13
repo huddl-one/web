@@ -1,0 +1,21 @@
+{
+  "name": "@huddl/prettier-config",
+  "private": true,
+  "version": "0.0.0",
+  "main": "index.mjs",
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "format": "prettier --check \"**/*.{mjs,ts,md,json}\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.1.0",
+    "prettier": "latest",
+    "prettier-plugin-tailwindcss": "^0.5.4"
+  },
+  "devDependencies": {
+    "@huddl/tsconfig": "workspace:*",
+    "typescript": "latest"
+  },
+  "prettier": "@huddl/prettier-config"
+}

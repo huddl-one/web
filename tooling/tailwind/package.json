@@ -1,0 +1,38 @@
+{
+  "name": "@huddl/tailwind-config",
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.ts",
+  "license": "MIT",
+  "files": [
+    "index.ts",
+    "postcss.js"
+  ],
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "eslint .",
+    "format": "prettier --check \"**/*.{mjs,ts,md,json}\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@types/node": "^20.8.5",
+    "autoprefixer": "latest",
+    "postcss": "latest",
+    "tailwindcss": "latest"
+  },
+  "devDependencies": {
+    "@huddl/eslint-config": "workspace:*",
+    "@huddl/prettier-config": "workspace:*",
+    "@huddl/tsconfig": "workspace:*",
+    "eslint": "latest",
+    "prettier": "latest",
+    "typescript": "latest"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@huddl/eslint-config/base"
+    ]
+  },
+  "prettier": "@huddl/prettier-config"
+}
