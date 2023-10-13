@@ -1,57 +1,20 @@
 {
-    "name": "huddl",
-    "version": "0.1.0",
-    "private": true,
-    "scripts": {
-        "dev": "next dev",
-        "build": "prisma generate && next build",
-        "start": "next start",
-        "lint": "next lint",
-        "postinstall": "prisma generate"
-    },
-    "dependencies": {
-        "@kinde-oss/kinde-auth-nextjs": "^1.8.21",
-        "@prisma/client": "^5.3.1",
-        "@radix-ui/react-avatar": "^1.0.4",
-        "@radix-ui/react-checkbox": "^1.0.4",
-        "@radix-ui/react-dialog": "^1.0.5",
-        "@radix-ui/react-dropdown-menu": "^2.0.6",
-        "@radix-ui/react-icons": "^1.3.0",
-        "@radix-ui/react-popover": "^1.0.7",
-        "@radix-ui/react-scroll-area": "^1.0.5",
-        "@radix-ui/react-select": "^2.0.0",
-        "@radix-ui/react-separator": "^1.0.3",
-        "@radix-ui/react-slot": "^1.0.2",
-        "@tailwindcss/typography": "^0.5.10",
-        "@tanstack/react-query": "^4.35.7",
-        "@tanstack/react-table": "^8.10.3",
-        "@trpc/client": "^10.38.5",
-        "@trpc/next": "^10.38.5",
-        "@trpc/react-query": "^10.38.5",
-        "@trpc/server": "^10.38.5",
-        "class-variance-authority": "^0.7.0",
-        "clsx": "^2.0.0",
-        "cmdk": "^0.2.0",
-        "lucide-react": "^0.279.0",
-        "next": "latest",
-        "next-themes": "^0.2.1",
-        "react": "latest",
-        "react-dom": "latest",
-        "recharts": "^2.8.0",
-        "tailwind-merge": "^1.14.0",
-        "tailwindcss-animate": "^1.0.7",
-        "zod": "^3.22.2"
-    },
-    "devDependencies": {
-        "@types/node": "latest",
-        "@types/react": "latest",
-        "@types/react-dom": "latest",
-        "autoprefixer": "latest",
-        "eslint": "latest",
-        "eslint-config-next": "latest",
-        "postcss": "latest",
-        "prisma": "^5.3.1",
-        "tailwindcss": "latest",
-        "typescript": "latest"
-    }
+  "name": "huddl",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "clean": "find . -name node_modules -o -name .next -o -name .expo -type d -prune | xargs rm -rf",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  },
+  "dependencies": {
+    "@huddl/prettier-config": "workspace:*"
+  },
+  "devDependencies": {
+    "prettier": "latest",
+    "turbo": "latest",
+    "typescript": "latest"
+  },
+  "prettier": "@huddl/prettier-config"
 }

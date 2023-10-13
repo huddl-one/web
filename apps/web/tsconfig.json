@@ -1,0 +1,21 @@
+{
+  "extends": "@huddl/tsconfig/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@web/*": ["./src/*"]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
+  },
+  "include": [
+    ".",
+    ".next/types/**/*.ts",
+    "../../packages/ui/components/button.tsx"
+  ],
+  "exclude": ["node_modules"]
+}
