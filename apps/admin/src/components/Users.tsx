@@ -1,6 +1,5 @@
 "use client";
 
-import { User } from "@prisma/client";
 import { Card, MultiSelect, MultiSelectItem, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, TextInput } from "@tremor/react";
 import { Eye, Router, SearchIcon } from "lucide-react";
 import { useState } from "react";
@@ -15,7 +14,7 @@ const colors: {
 
 function Users({
     users,
-}: {users: User[]}) {
+}: {users: any[]}) {
     const [role, setRole] = useState<string[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
 
@@ -24,7 +23,7 @@ function Users({
       "user",
     ];
 
-  const isUserSelected = (user: User) =>
+  const isUserSelected = (user: any) =>
   ((role === user.roles) || role.length === 0) && ( user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) || user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) || searchQuery === "");
     return (
         <div className="col-span-3 lg:col-span-4 space-y-8 h-full">
