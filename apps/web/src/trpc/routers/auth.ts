@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 
 import { db } from "@huddl/db";
 
+import { redis } from "@web/lib/redis";
 import { publicProcedure, router } from "../trpc";
 
 export const authRouter = router({
@@ -14,22 +15,63 @@ export const authRouter = router({
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
 
+    const cacheKey = `user:${user.id}`;
+
+    let cachedUser = await redis.hgetall(cacheKey);
+
+    if (cachedUser) {
+      return {
+        success: true,
+      };
+    }
+
     const dbuser = await db.user.findUnique({
       where: {
         id: user.id,
       },
     });
 
-    if (!dbuser) {
-      await db.user.create({
-        data: {
-          id: user.id,
-          email: user.email!,
-          firstName: user.given_name!,
-          lastName: user.family_name!,
-        },
-      });
+    if (dbuser) {
+      // Cache user
+      await redis.hset(cacheKey, dbuser);
+
+      return {
+        success: true,
+      };
     }
+
+    // Making user's username
+    let username = `${user.email?.split("@")!}`;
+
+    // Check if someone else has this username
+    const usernameTaken = await db.user.findFirst({
+      where: {
+        username,
+      },
+    });
+
+    // If username is taken, add a random number to username
+    if (usernameTaken) {
+      const random = Math.floor(Math.random() * 1000);
+      username = `${username}${random}`;
+    }
+
+    const userCreation = await db.user.create({
+      data: {
+        id: user.id,
+        email: user.email!,
+        firstName: user.given_name!,
+        lastName: user.family_name!,
+        username,
+      },
+    });
+    
+    if (!userCreation) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+    }
+
+    // Cache user
+    await redis.hset(cacheKey, userCreation);
 
     return {
       success: true,

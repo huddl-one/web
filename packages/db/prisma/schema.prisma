@@ -16,12 +16,123 @@ datasource db {
 }
 
 model User {
-  id        String   @id @unique //matches kinde user id
-  email     String   @unique
-  firstName String
-  lastName  String
-  image     String?
-  roles     String[]
+  id               String          @id @unique //matches kinde user id
+  email            String          @unique
+  username         String          @unique
+  firstName        String
+  lastName         String
+  image            String?
+  roles            String[]
+  friends          User[]          @relation("UserFollows")
+  friendOf         User[]          @relation("UserFollows")
+  sentRequests     FriendRequest[] @relation("UserSender")
+  receivedRequests FriendRequest[] @relation("UserReceiver")
+  chats            Chat[]          @relation("UsersInChat")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Message Message[]
+  Group   Group[]
+}
+
+enum Difficulty {
+  easy
+  medium
+  hard
+}
+
+model Problem {
+  id               String     @id @default(cuid())
+  title            String
+  slug             String     @unique
+  difficulty       Difficulty
+  published        Boolean    @default(false)
+  description      String?
+  tags             String[]
+  problemStatement String?
+  starterCode      String?
+  exampleInput     String?
+  exampleOutput    String?
+  testCaseInput    String?
+  testCaseOutput   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Submission {
+  id        String   @id @default(cuid())
+  code      String
+  language  String
+  status    String
+  output    String?
+  error     String?
+  time      Int?
+  memory    Int?
+  verdict   String?
+  testCases String[]
+  userId    String
+  problemId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum RequestStatus {
+  pending
+  accepted
+  rejected
+}
+
+model FriendRequest {
+  id         String        @id @default(cuid())
+  senderId   String
+  receiverId String
+  status     RequestStatus @default(pending)
+
+  sender   User @relation("UserSender", fields: [senderId], references: [id])
+  receiver User @relation("UserReceiver", fields: [receiverId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Chat {
+  id       String    @id @default(cuid())
+  users    User[]    @relation("UsersInChat")
+  messages Message[]
+
+  isGroupChat Boolean @default(false)
+  group       Group?  @relation(fields: [groupId], references: [id])
+  groupId     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id       String   @id @default(cuid())
+  content  String
+  chatId   String
+  senderId String
+  sentAt   DateTime @default(now())
+
+  chat   Chat @relation(fields: [chatId], references: [id])
+  sender User @relation(fields: [senderId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Group {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  adminId     String
+
+  admin User   @relation(fields: [adminId], references: [id])
+  chats Chat[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

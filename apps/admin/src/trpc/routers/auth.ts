@@ -26,6 +26,22 @@ export const authRouter = router({
       },
     });
 
+    // Making user's username
+    let username = `${user.email?.split("@")!}`;
+
+    // Check if someone else has this username
+    const usernameTaken = await db.user.findFirst({
+      where: {
+        username,
+      },
+    });
+
+    // If username is taken, add a random number to username
+    if (usernameTaken) {
+      const random = Math.floor(Math.random() * 1000);
+      username = `${username}${random}`;
+    }
+
     if (!dbuser) {
       await db.user.create({
         data: {
@@ -34,6 +50,7 @@ export const authRouter = router({
           firstName: user.given_name!,
           lastName: user.family_name!,
           roles: kindePermissions.permissions || ["user"],
+          username, // Add the username property here
         },
       });
     }

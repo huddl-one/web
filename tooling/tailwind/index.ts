@@ -10,6 +10,8 @@ export default {
     "./node_modules/@tremor/**/*.{js,ts,jsx,tsx}", // Tremor module
   ],
   theme: {
+    transparent: "transparent",
+    current: "currentColor",
     container: {
       center: true,
       padding: "2rem",
@@ -22,23 +24,23 @@ export default {
         tremor: {
           brand: {
             faint: "#eff6ff", // blue-50
-            muted: "#bfdbfe", // blue-200
+            muted: "hsl(var(--muted))", // blue-200
             subtle: "#60a5fa", // blue-400
-            DEFAULT: "#3b82f6", // blue-500
+            DEFAULT: "hsl(var(--primary))", // blue-500
             emphasis: "#1d4ed8", // blue-700
             inverted: "#ffffff", // white
           },
           background: {
             muted: "#f9fafb", // gray-50
             subtle: "#f3f4f6", // gray-100
-            DEFAULT: "#ffffff", // white
+            DEFAULT: "hsl(var(--background))", // white
             emphasis: "#374151", // gray-700
           },
           border: {
-            DEFAULT: "#e5e7eb", // gray-200
+            DEFAULT: "hsl(var(--border))", // gray-200
           },
           ring: {
-            DEFAULT: "#e5e7eb", // gray-200
+            DEFAULT: "hsl(var(--ring))", // gray-200
           },
           content: {
             subtle: "#9ca3af", // gray-400
@@ -155,6 +157,5 @@ export default {
         /^(fill-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
     },
   ],
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@headlessui/tailwindcss")],
 } satisfies Config;

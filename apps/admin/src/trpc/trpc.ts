@@ -20,6 +20,29 @@ const isAuth = middleware(async (opts) => {
     });
 });
 
+const isAdmin = middleware(async (opts) => {
+    const { getUser, getPermissions } = getKindeServerSession();
+    const user = getUser();
+
+    const kindePermissions = getPermissions()
+
+    if (!user || !user.id) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    if (!(kindePermissions.permissions?.includes("admin"))) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    return opts.next({
+        ctx: {
+            userId: user.id,
+            user,
+        },
+    });
+});
+
 export const router = t.router;
 export const publicProcedure = t.procedure;
 export const privateProcedure = t.procedure.use(isAuth);
+export const adminProcedure = t.procedure.use(isAdmin)
