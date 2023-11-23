@@ -40,7 +40,7 @@ export default async function RootLayout({
             <main className="hidden 2xl:grid grid-cols-5 gap-8 relative">
                 <LeftSidebar
                     user={user}
-                    className="fixed w-[15%]"
+                    className="fixed w-[14%]"
                 />
                 <div className="col-start-2 col-span-3">
                 {children}
@@ -54,7 +54,7 @@ export default async function RootLayout({
                         user={user}
                     />
                 </section>
-                <div className="col-start-2 col-span-3">
+                <div className="col-start-2 col-span-4">
                 {children}
                 </div>
             </main>

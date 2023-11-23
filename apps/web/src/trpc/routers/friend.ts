@@ -3,6 +3,9 @@ import { TRPCError } from "@trpc/server";
 
 import { db } from "@huddl/db";
 
+import { toPusherKey } from "@huddl/utils";
+import { customHmset } from "@web/lib/helpers/custom-hmset";
+import { pusherServer } from "@web/lib/pusher";
 import { redis } from "@web/lib/redis";
 import { addFriendValidator } from "@web/lib/validations/add-friend";
 import { privateProcedure, router } from "../trpc";
@@ -22,7 +25,7 @@ export const friendRouter = router({
 
     const cacheKey = `user:${user.id}`;
 
-    let cachedUser = await redis.hgetall(cacheKey);
+    let cachedUser: any = await redis.HGETALL(cacheKey);
 
     if (!cachedUser) {
       cachedUser = await db.user.findUnique({
@@ -35,7 +38,7 @@ export const friendRouter = router({
         throw new TRPCError({ code: "UNAUTHORIZED", message: "User not found" });
       }
 
-      await redis.hmset(cacheKey, cachedUser);
+      await customHmset(cacheKey, cachedUser);
     }
 
     // cachedUser = {
@@ -79,7 +82,7 @@ export const friendRouter = router({
 
     const friendRequestcacheKey = `user:${friend.id}:friend-requests`;
 
-    const friendRequestExists = await redis.sismember(friendRequestcacheKey, cachedUser.id);
+    const friendRequestExists = await redis.SISMEMBER(friendRequestcacheKey, cachedUser.id);
 
     if (friendRequestExists) {
       throw new TRPCError({ code: "BAD_REQUEST", message: "Friend request already sent" });
@@ -96,7 +99,9 @@ export const friendRouter = router({
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to create friend request" });
     }
 
-    await redis.sadd(friendRequestcacheKey, cachedUser.id);
+    pusherServer.trigger(toPusherKey(`user:${friend.id}:friend_requests`), "friend_requests", {senderName: user.given_name + " " + user.family_name, senderUsername: cachedUser.username});
+
+    await redis.SADD(friendRequestcacheKey, cachedUser.id);
 
     return {
       success: true,
@@ -113,7 +118,7 @@ getRequests: privateProcedure
 
   const cacheKey = `user:${user.id}:friend-requests`;
 
-  let friendRequests = await redis.smembers(cacheKey);
+  let friendRequests = await redis.SMEMBERS(cacheKey);
 
   if (!friendRequests || friendRequests.length === 0) {
     const friendRequestRecords = await db.friendRequest.findMany({
@@ -151,7 +156,7 @@ getRequests: privateProcedure
 
     for (let i = 0; i < friendRequests.length; i++) {
       const friendRequesterId = friendRequests[i];
-      const friend = await redis.hgetall(`user:${friendRequesterId}`);
+      const friend = await redis.HGETALL(`user:${friendRequesterId}`);
 
       if (friend) {
         cachedFriendRequests[i] = {
@@ -179,7 +184,7 @@ getRequests: privateProcedure
           lastName: friend.lastName,
         } as any;
 
-        await redis.hmset(`user:${friendRequesterId}`, friend);
+        customHmset(`user:${friendRequesterId}`, friend);
       }
     }
 
@@ -214,7 +219,7 @@ acceptRequest: privateProcedure
 
   const cacheKey = `user:${user.id}:friend-requests`;
 
-  await redis.srem(cacheKey, friendRequester.id);
+  await redis.SREM(cacheKey, friendRequester.id);
 
   let friendRequest = await db.friendRequest.findFirst({
     where: {
@@ -259,12 +264,46 @@ acceptRequest: privateProcedure
         },
       },
     });
-  
+
+    let chatCacheKey = "";
+    if (user.id < friendRequester.id) {
+      chatCacheKey = `chat:${user.id}--${friendRequester.id}`;
+    }
+    else {
+      chatCacheKey = `chat:${friendRequester.id}--${user.id}`;
+    }
+
+    await db.chat.create({
+      data: {
+        id: chatCacheKey,
+        users: {
+          connect: [
+            {
+              id: user.id,
+            },
+            {
+              id: friendRequester.id,
+            },
+          ],
+        },
+      },
+    });
+    
+    const recentChatCacheKeyOfUser = `recent_chats:${user.id}`;
+    const recentChatCacheKeyOfFriend = `recent_chats:${friendRequester.id}`;
+    
     const friendsCacheKey = `user:${user.id}:friends`;
     const otherFriendsCacheKey = `user:${friendRequester.id}:friends`;
-  
-    await redis.sadd(friendsCacheKey, friendRequester.id);
-    await redis.sadd(otherFriendsCacheKey, user.id);
+
+    // time now in milliseconds
+    let time = Date.now();
+
+    // No need to add some to chatCacheKey because only group chats have some metadata and they are not created here
+    
+    await redis.ZADD(recentChatCacheKeyOfUser, {score: time, value: chatCacheKey});
+    await redis.ZADD(recentChatCacheKeyOfFriend, {score: time,value: chatCacheKey});
+    await redis.SADD(friendsCacheKey, friendRequester.id);
+    await redis.SADD(otherFriendsCacheKey, user.id);
 
     return {
       success: true,
@@ -315,7 +354,7 @@ declineRequest: privateProcedure
     },
   });
 
-  await redis.srem(cacheKey, friendRequester.id);
+  await redis.SREM(cacheKey, friendRequester.id);
 
   return {
     success: true,

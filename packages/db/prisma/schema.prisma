@@ -99,7 +99,7 @@ model FriendRequest {
 }
 
 model Chat {
-  id       String    @id @default(cuid())
+  id       String    @id @unique
   users    User[]    @relation("UsersInChat")
   messages Message[]
 
