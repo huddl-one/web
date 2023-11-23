@@ -1,6 +1,7 @@
 import { db } from "@huddl/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import Requests from "@web/components/requests/Requests";
+import { customHmset } from "@web/lib/helpers/custom-hmset";
 import { redis } from "@web/lib/redis";
 import { notFound } from "next/navigation";
 
@@ -16,7 +17,7 @@ export default async function Home() {
 
   const cacheKey = `user:${user.id}:friend-requests`;
 
-  let friendRequests = await redis.smembers(cacheKey);
+  let friendRequests = await redis.SMEMBERS(cacheKey);
 
   if (!friendRequests || friendRequests.length === 0) {
     const friendRequestRecords = await db.friendRequest.findMany({
@@ -54,7 +55,7 @@ export default async function Home() {
 
     for (let i = 0; i < friendRequests.length; i++) {
       const friendRequesterId = friendRequests[i];
-      const friend = await redis.hgetall(`user:${friendRequesterId}`);
+      const friend = await redis.HGETALL(`user:${friendRequesterId}`);
 
       if (friend) {
         cachedFriendRequests[i] = {
@@ -82,7 +83,7 @@ export default async function Home() {
           lastName: friend.lastName,
         } as any;
 
-        await redis.hmset(`user:${friendRequesterId}`, friend);
+        await customHmset(`user:${friendRequesterId}`, friend);
       }
     }
 

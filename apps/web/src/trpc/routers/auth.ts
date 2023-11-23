@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 
 import { db } from "@huddl/db";
 
+import { customHmset } from "@web/lib/helpers/custom-hmset";
 import { redis } from "@web/lib/redis";
 import { publicProcedure, router } from "../trpc";
 
@@ -17,7 +18,7 @@ export const authRouter = router({
 
     const cacheKey = `user:${user.id}`;
 
-    let cachedUser = await redis.hgetall(cacheKey);
+    let cachedUser = await redis.HGETALL(cacheKey);
 
     if (cachedUser) {
       return {
@@ -33,7 +34,7 @@ export const authRouter = router({
 
     if (dbuser) {
       // Cache user
-      await redis.hset(cacheKey, dbuser);
+      await customHmset(cacheKey, dbuser);
 
       return {
         success: true,
@@ -71,7 +72,7 @@ export const authRouter = router({
     }
 
     // Cache user
-    await redis.hset(cacheKey, userCreation);
+    await customHmset(cacheKey, userCreation);
 
     return {
       success: true,

@@ -42,9 +42,13 @@
     "lucide-react": "^0.279.0",
     "next": "latest",
     "next-themes": "^0.2.1",
+    "pusher": "^5.2.0",
+    "pusher-js": "^8.3.0",
     "react": "latest",
     "react-dom": "latest",
     "react-hook-form": "^7.48.2",
+    "react-textarea-autosize": "^8.5.3",
+    "redis": "^4.6.11",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.2"
