@@ -2,23 +2,93 @@
 
 import { Badge, Tab, TabGroup, TabList, TabPanel, TabPanels } from "@tremor/react";
 import { Editor } from "novel";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { colors, difficultyTypes } from "./Problems";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
 import { Switch } from "./ui/switch";
 import { Textarea } from "./ui/textarea";
 
+import { trpc } from "@admin/app/_trpc/client";
+import { getLocalStorage } from "@admin/utils/hooks/useLocalStorage";
 import { Editor as MonacoEditor } from '@monaco-editor/react';
+import { useToast } from "./ui/use-toast";
 
 interface ProblemStatementEditorProps {
   slug: string;
   problemTitle: string;
   problemDiff: string;
   isPublic: boolean;
+}
+
+interface EditorJSON {
+  type: string;
+  content: any[];
+}
+
+interface EditorCode {
+  code: string;
+}
+
+const ProblemEditor = ({slug}: {slug: string}) => {
+  const [editorLanguage, setEditorLanguage] = useState('javascript')
+  const [code, setCode] = useState<EditorCode>({code: ''})
+
+  useEffect(() => {
+    // Load the code from localStorage when the component mounts or when editorLanguage changes
+    const storedCode = getLocalStorage(slug + '-editorValue-' + editorLanguage) as unknown as EditorCode;
+    console.log(editorLanguage, storedCode);
+    if (storedCode && 'code' in storedCode && storedCode.code !== "") {
+      setCode(storedCode);
+    } else {
+      // Reset the code if there's nothing in localStorage for the selected language
+      setCode({ code: '' });
+    }
+  }, [editorLanguage]); // Add editorLanguage as a dependency
+
+  function handleEditorChange(value: string | undefined, event: any) {
+    let key = slug + '-editorValue-' + editorLanguage;
+
+    // Save to localStorage
+    if (value !== undefined) {
+      localStorage.setItem(key, JSON.stringify({ code: value }));
+  }
+}
+    
+
+  return (
+      <div className="px-6 overflow-auto w-auto">
+        <div className="">
+        <section className="flex justify-between">
+        <Select defaultValue={editorLanguage} onValueChange={(value) => setEditorLanguage(value)}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Select a Language" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Languages</SelectLabel>
+              <SelectItem value="javascript">JavaScript</SelectItem>
+              <SelectItem value="python">Python3</SelectItem>
+              <SelectItem value="java">Java</SelectItem>
+              <SelectItem value="cpp">C++</SelectItem>
+              <SelectItem value="c">C</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        </section>
+        <MonacoEditor
+          className="mt-5"
+          height="90vh"
+          language={editorLanguage} // Use language instead of defaultLanguage
+          value={code.code} // Use value instead of defaultValue
+          onChange={handleEditorChange}
+          />
+        </div>
+  </div>
+  )
 }
 
 const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:ProblemStatementEditorProps) => {
@@ -28,9 +98,26 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
 
     // save to localstorage
     if (value !== undefined) {
-      localStorage.setItem(key, value);
+      localStorage.setItem(key, JSON.stringify({code: value}));
     }
   }
+
+  const { toast } = useToast();
+  const updateProblemMutation = trpc.problem.updateProblem.useMutation({
+    onSuccess: () => {
+      toast({
+        title: "Success ",
+        description: "Updated the question successfully",
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      })
+    }
+  })
   /**
    * 1. When clicked on save button, get the content from local storage
    * 2. Send the content to the server
@@ -38,6 +125,23 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
    */
 
   const [problemDifficulty, setProblemDifficulty] = useState<string>(problemDiff);
+
+  function handleSave() {
+    // Get the value from localstorage
+    const editorInJSON = getLocalStorage(slug) as unknown as EditorJSON;
+    console.log(editorInJSON.content);
+
+    // Get the code from localstorage
+    const editorCode = getLocalStorage(slug+'editorValue');
+    console.log(editorCode);
+
+    updateProblemMutation.mutate({
+      problemSlug: slug,
+      problemStatement: JSON.stringify(editorInJSON),
+    })
+  }
+
+
     
   return (
     <>
@@ -57,7 +161,7 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
         <h2 className="text-2xl font-semibold tracking-tight">
           Question Data
         </h2>
-        <Button size={"lg"}>Save</Button>
+        <Button onClick={handleSave} size={"lg"}>Save</Button>
       </CardHeader>
       <section className="grid grid-cols-5 gap-8">
     <Card className="col-span-2">
@@ -69,39 +173,26 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
     <Card className="col-span-2">
       <CardHeader><h2 className="text-lg font-semibold">Starter Code</h2></CardHeader>
       <CardContent>
-      <MonacoEditor
+      {/* <MonacoEditor
       height="90vh"
       defaultLanguage="javascript"
-      // defaultValue={JSON.stringify(getLocalStorage(slug+'editorValue'))}
+      defaultValue={((getLocalStorage(slug+'editorValue') as unknown as EditorCode).code)}
       onChange={handleEditorChange}
-    />
+    /> */}
+    <ProblemEditor slug={slug} />
       </CardContent>
     </Card>
     <section className="col-span-1 space-y-10">
     <Card className="">
-      <CardHeader><h2 className="text-lg font-semibold">Examples</h2></CardHeader>
+      <CardHeader><h2 className="text-lg font-semibold">Example Test Case</h2></CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex flex-col gap-4 w-full">
-          <h3 className="font-medium">Inputs</h3>
-          <Textarea/>
-        </div>
-        <div className="flex flex-col gap-4 w-full">
-          <h3 className="font-medium">Outputs</h3>
-          <Textarea/>
-        </div>
+        <Textarea/>
       </CardContent>
     </Card>
     <Card className="">
     <CardHeader><h2 className="text-lg font-semibold">Test Cases</h2></CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex flex-col gap-4 w-full">
-          <h3 className="font-medium">Inputs</h3>
-          <Textarea/>
-        </div>
-        <div className="flex flex-col gap-4 w-full">
-          <h3 className="font-medium">Outputs</h3>
-          <Textarea/>
-        </div>
+        <Textarea/>
       </CardContent>
     </Card>
     </section>
@@ -115,7 +206,7 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
                 <h2 className="text-2xl font-semibold tracking-tight">
                   Meta Data
                 </h2>
-                <Button size={"lg"}>Save</Button>
+                <Button size={"lg"} disabled={updateProblemMutation.isLoading}>Save</Button>
               </CardHeader>
             <section className="grid grid-cols-5 gap-8">
             <section className="col-span-3 space-y-10">

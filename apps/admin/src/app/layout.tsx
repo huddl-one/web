@@ -5,6 +5,7 @@ import Providers from "@admin/components/Providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
+import { Toaster } from "@admin/components/ui/toaster";
 import { cn } from "@huddl/utils";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -31,6 +32,7 @@ export default function RootLayout({
           <Navbar />
           {children}
         </body>
+        <Toaster />
       </Providers>
     </html>
   );

@@ -32,8 +32,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Message Message[]
-  Group   Group[]
+  Message     Message[]
+  Group       Group[]
+  Submission  Submission[]
+  UserProblem UserProblem[]
 }
 
 enum Difficulty {
@@ -52,13 +54,25 @@ model Problem {
   tags             String[]
   problemStatement String?
   starterCode      String?
-  exampleInput     String?
-  exampleOutput    String?
-  testCaseInput    String?
-  testCaseOutput   String?
+  exampleTestCases String?
+  testCases        String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  UserProblem UserProblem[]
+}
+
+model UserProblem {
+  id        String    @id @default(cuid())
+  userId    String
+  problemId String
+  solved    Boolean   @default(false)
+  solvedAt  DateTime?
+
+  user    User    @relation(fields: [userId], references: [id])
+  problem Problem @relation(fields: [problemId], references: [id])
+
+  @@unique([userId, problemId])
 }
 
 model Submission {
@@ -77,6 +91,7 @@ model Submission {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [userId], references: [id])
 }
 
 enum RequestStatus {

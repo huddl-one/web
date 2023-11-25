@@ -1,5 +1,5 @@
 
-import { newProblemReq } from "@admin/utils/types/problem-editor";
+import { newProblemReq, updateProblemReq } from "@admin/utils/types/problem-editor";
 import { db } from "@huddl/db";
 import { slugify } from "@huddl/utils";
 import { adminProcedure, router } from "../trpc";
@@ -29,4 +29,29 @@ export const problemRouter = router({
             redirect: `/problems/${problem.slug}`,
         };
     }),
+    updateProblem: adminProcedure
+    .input(updateProblemReq)
+    .mutation(async ({ ctx, input }) => {
+        const { userId } = ctx;
+        const { problemSlug, problemStatement } = input;
+
+        const problem = await db.problem.update({
+            where: {
+                slug: problemSlug,
+            },
+            data: {
+                problemStatement,
+            },
+        });
+
+        if (!problem) {
+            throw new Error("Problem update failed");
+        }
+
+        return {
+            success: true,
+            redirect: `/problems/${problem.slug}`,
+        };
+    }
+    ),
 });

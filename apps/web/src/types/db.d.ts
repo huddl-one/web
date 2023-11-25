@@ -37,3 +37,25 @@ interface GroupMeta {
     name: string;
     description: string;
 }
+
+interface Problem {
+    id: string;
+	title: string;
+	problemStatement: string;
+	examples: Example[];
+	constraints: string;
+	order: number;
+	starterCode: string;
+	handlerFunction: ((fn: any) => boolean) | string;
+	starterFunctionName: string;
+}
+
+interface DBProblem {
+	id: string;
+	title: string;
+	category: string;
+	difficulty: string;
+	likes: number;
+	dislikes: number;
+	order: number;
+};

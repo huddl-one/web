@@ -4,17 +4,14 @@ import dynamicIconImports from "lucide-react/dynamicIconImports";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { cn, toPusherKey } from "@huddl/utils";
+import { cn } from "@huddl/utils";
 
 import {
   KindeUser
 } from "@kinde-oss/kinde-auth-nextjs/server";
 import { trpc } from "@web/app/_trpc/client";
-import { pusherClient } from "@web/lib/pusher";
-import { useEffect } from "react";
 import { buttonVariants } from "../ui/button";
 import Icon from "../ui/icon";
-import { ToastAction } from "../ui/toast";
 import { useToast } from "../ui/use-toast";
 import UserAccountNav from "./UserAccountNav";
 
@@ -101,29 +98,29 @@ export function LeftSidebar({ className, user }: SidebarProps) {
 
   let username = data?.username;
 
-  useEffect(() => {
-    pusherClient.subscribe(toPusherKey(`user:${user.id}:friend_requests`));
+  // useEffect(() => {
+  //   pusherClient.subscribe(toPusherKey(`user:${user.id}:friend_requests`));
 
-    const friendRequestHandler = ({
-      senderName,
-      senderUsername,
-    }: IncomingFriendRequest) => {
-      toast({
-        title: `Friend Request from ${senderName}( @${senderUsername} )`,
-        description: "Click to view",
-        action: (
-          <ToastAction altText="Goto schedule to undo">View</ToastAction>
-        ),
-      })
-    }
+  //   const friendRequestHandler = ({
+  //     senderName,
+  //     senderUsername,
+  //   }: IncomingFriendRequest) => {
+  //     toast({
+  //       title: `Friend Request from ${senderName}( @${senderUsername} )`,
+  //       description: "Click to view",
+  //       action: (
+  //         <ToastAction altText="Goto schedule to undo">View</ToastAction>
+  //       ),
+  //     })
+  //   }
 
-    pusherClient.bind('friend_requests', friendRequestHandler)
+  //   pusherClient.bind('friend_requests', friendRequestHandler)
   
-    return () => {
-      pusherClient.unsubscribe(toPusherKey(`user:${user.id}:friend_requests`));
-      pusherClient.unbind('friend_requests', friendRequestHandler)
-    }
-  }, [])
+  //   return () => {
+  //     pusherClient.unsubscribe(toPusherKey(`user:${user.id}:friend_requests`));
+  //     pusherClient.unbind('friend_requests', friendRequestHandler)
+  //   }
+  // }, [])
   
   
   return (
