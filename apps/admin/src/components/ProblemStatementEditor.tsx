@@ -10,7 +10,6 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
 import { Switch } from "./ui/switch";
-import { Textarea } from "./ui/textarea";
 
 import { trpc } from "@admin/app/_trpc/client";
 import { getLocalStorage } from "@admin/utils/hooks/useLocalStorage";
@@ -101,9 +100,43 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
       localStorage.setItem(key, JSON.stringify({code: value}));
     }
   }
+  
+  function handleExamplesEditorChange(value:string | undefined, event: any) {
+    let key = slug+'examples'
+
+    // save to localstorage
+    if (value !== undefined) {
+      localStorage.setItem(key, JSON.stringify({code: value}));
+    }
+  }
+  
+  function handleTestCasesEditorChange(value:string | undefined, event: any) {
+    let key = slug+'testCases'
+
+    // save to localstorage
+    if (value !== undefined) {
+      localStorage.setItem(key, JSON.stringify({code: value}));
+    }
+  }
 
   const { toast } = useToast();
   const updateProblemMutation = trpc.problem.updateProblem.useMutation({
+    onSuccess: () => {
+      toast({
+        title: "Success ",
+        description: "Updated the question successfully",
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      })
+    }
+  })
+
+  const updateProblemMetaMutation = trpc.problem.updateProblemMeta.useMutation({
     onSuccess: () => {
       toast({
         title: "Success ",
@@ -125,19 +158,57 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
    */
 
   const [problemDifficulty, setProblemDifficulty] = useState<string>(problemDiff);
+  const [prblmTitle, setProblemTitle] = useState<string>(problemTitle);
+  const [isProblemPublic, setIsProblemPublic] = useState<boolean>(isPublic);
+
+  function handleMetaDataSave() {
+    updateProblemMetaMutation.mutate({
+      problemSlug: slug,
+      title: prblmTitle,
+      difficulty: problemDifficulty as "easy" | "medium" | "hard",
+      isProblemPublic: isProblemPublic,
+    })
+  }
 
   function handleSave() {
     // Get the value from localstorage
     const editorInJSON = getLocalStorage(slug) as unknown as EditorJSON;
     console.log(editorInJSON.content);
 
-    // Get the code from localstorage
-    const editorCode = getLocalStorage(slug+'editorValue');
-    console.log(editorCode);
+    let starterCode: any = {}
+
+    // Get the code from localstorage for each language
+    let editorCode = getLocalStorage(slug+'-editorValue-c') as unknown as EditorCode;
+    starterCode['c'] = editorCode.code;
+
+    editorCode = getLocalStorage(slug+'-editorValue-cpp') as unknown as EditorCode;
+    starterCode['cpp'] = editorCode.code;
+
+    editorCode = getLocalStorage(slug+'-editorValue-java') as unknown as EditorCode;
+    starterCode['java'] = editorCode.code;
+
+    editorCode = getLocalStorage(slug+'-editorValue-python') as unknown as EditorCode;
+    starterCode['python'] = editorCode.code;
+
+    editorCode = getLocalStorage(slug+'-editorValue-javascript') as unknown as EditorCode;
+    starterCode['javascript'] = editorCode.code;
+
+    console.log(starterCode);
+
+    // Get the examples from localstorage
+    let examples = getLocalStorage(slug+'examples') as unknown as EditorCode;
+    console.log(examples.code);
+
+    // Get the test cases from localstorage
+    let testCases = getLocalStorage(slug+'testCases') as unknown as EditorCode;
+    console.log(testCases.code);
 
     updateProblemMutation.mutate({
       problemSlug: slug,
       problemStatement: JSON.stringify(editorInJSON),
+      starterCode: JSON.stringify(starterCode),
+      examples: examples.code ? JSON.stringify(examples.code) : "",
+      testCases: testCases.code ? JSON.stringify(testCases.code) : "",
     })
   }
 
@@ -161,9 +232,9 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
         <h2 className="text-2xl font-semibold tracking-tight">
           Question Data
         </h2>
-        <Button onClick={handleSave} size={"lg"}>Save</Button>
+        <Button onClick={handleSave} disabled={updateProblemMutation.isLoading} size={"lg"}>Save</Button>
       </CardHeader>
-      <section className="grid grid-cols-5 gap-8">
+      <section className="grid grid-cols-4 gap-8">
     <Card className="col-span-2">
       <CardHeader><h2 className="text-lg font-semibold">Problem Statement</h2></CardHeader>
       <CardContent>
@@ -173,26 +244,30 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
     <Card className="col-span-2">
       <CardHeader><h2 className="text-lg font-semibold">Starter Code</h2></CardHeader>
       <CardContent>
-      {/* <MonacoEditor
-      height="90vh"
-      defaultLanguage="javascript"
-      defaultValue={((getLocalStorage(slug+'editorValue') as unknown as EditorCode).code)}
-      onChange={handleEditorChange}
-    /> */}
-    <ProblemEditor slug={slug} />
+      <ProblemEditor slug={slug} />
       </CardContent>
     </Card>
-    <section className="col-span-1 space-y-10">
+    <section className="col-span-5 space-y-10">
     <Card className="">
       <CardHeader><h2 className="text-lg font-semibold">Example Test Case</h2></CardHeader>
       <CardContent className="space-y-4">
-        <Textarea/>
+        <MonacoEditor
+          height="30vh"
+          defaultLanguage="javascript"
+          defaultValue={((getLocalStorage(slug+'examples') as unknown as EditorCode).code)}
+          onChange={handleExamplesEditorChange}
+        />
       </CardContent>
     </Card>
     <Card className="">
     <CardHeader><h2 className="text-lg font-semibold">Test Cases</h2></CardHeader>
       <CardContent className="space-y-4">
-        <Textarea/>
+      <MonacoEditor
+          height="30vh"
+          defaultLanguage="javascript"
+          defaultValue={((getLocalStorage(slug+'testCases') as unknown as EditorCode).code)}
+          onChange={handleTestCasesEditorChange}
+        />
       </CardContent>
     </Card>
     </section>
@@ -206,7 +281,7 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
                 <h2 className="text-2xl font-semibold tracking-tight">
                   Meta Data
                 </h2>
-                <Button size={"lg"} disabled={updateProblemMutation.isLoading}>Save</Button>
+                <Button size={"lg"} onClick={handleMetaDataSave} disabled={updateProblemMetaMutation.isLoading}>Save</Button>
               </CardHeader>
             <section className="grid grid-cols-5 gap-8">
             <section className="col-span-3 space-y-10">
@@ -223,16 +298,7 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
                         Update the title of the problem.
                       </span>
                     </Label>
-                    <Input id="title" placeholder="Title"  className="w-1/3" defaultValue={problemTitle}/>
-                  </div>
-                <div className="flex items-center justify-between space-x-2">
-                    <Label htmlFor="title" className="flex flex-col space-y-1">
-                      <span>Title</span>
-                      <span className="font-normal leading-snug text-muted-foreground">
-                        Update the title of the problem.
-                      </span>
-                    </Label>
-                    <Input id="title" placeholder="Title"  className="w-1/3" defaultValue={problemTitle}/>
+                    <Input id="title" placeholder="Title"  className="w-1/3" defaultValue={problemTitle} onChange={(value) => setProblemTitle(value.target.value)}/>
                   </div>
                   <div className="flex items-center justify-between space-x-2">
                     <Label htmlFor="difficulty" className="flex flex-col space-y-1">
@@ -241,7 +307,7 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
                         Update the difficulty of the problem.
                       </span>
                     </Label>
-                    <Select onValueChange={
+                    <Select defaultValue={problemDiff} onValueChange={
                           (value) => setProblemDifficulty(value)
                         }>
                           <SelectTrigger id="difficulty" className="w-1/3" defaultValue={problemDifficulty}>
@@ -275,7 +341,7 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
                         This toggle will make the problem public.
                       </span>
                     </Label>
-                    <Switch id="public" defaultChecked={isPublic}/>
+                    <Switch id="public" onCheckedChange={(value) => setIsProblemPublic(value)} defaultChecked={isPublic}/>
                   </div>
                 </CardContent>
               </Card>

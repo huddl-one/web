@@ -1,5 +1,5 @@
 
-import { newProblemReq, updateProblemReq } from "@admin/utils/types/problem-editor";
+import { newProblemReq, updateProblemMetaReq, updateProblemReq } from "@admin/utils/types/problem-editor";
 import { db } from "@huddl/db";
 import { slugify } from "@huddl/utils";
 import { adminProcedure, router } from "../trpc";
@@ -31,9 +31,8 @@ export const problemRouter = router({
     }),
     updateProblem: adminProcedure
     .input(updateProblemReq)
-    .mutation(async ({ ctx, input }) => {
-        const { userId } = ctx;
-        const { problemSlug, problemStatement } = input;
+    .mutation(async ({ input }) => {
+        const { problemSlug, problemStatement, starterCode, examples, testCases } = input;
 
         const problem = await db.problem.update({
             where: {
@@ -41,6 +40,9 @@ export const problemRouter = router({
             },
             data: {
                 problemStatement,
+                starterCode,
+                exampleTestCases: examples,
+                testCases,
             },
         });
 
@@ -54,4 +56,29 @@ export const problemRouter = router({
         };
     }
     ),
+    updateProblemMeta: adminProcedure
+    .input(updateProblemMetaReq)
+    .mutation(async ({ input }) => {
+        const { problemSlug, title, difficulty, isProblemPublic } = input;
+
+        const problem = await db.problem.update({
+            where: {
+                slug: problemSlug,
+            },
+            data: {
+                title,
+                difficulty,
+                published: isProblemPublic,
+            },
+        });
+
+        if (!problem) {
+            throw new Error("Problem meta update failed");
+        }
+
+        return {
+            success: true,
+            redirect: `/problems/${problem.slug}`,
+        };
+    }),
 });
