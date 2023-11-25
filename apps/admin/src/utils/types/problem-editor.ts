@@ -6,3 +6,8 @@ export const newProblemReq = z.object({
 });
 
 export type NewProblemReq= z.infer<typeof newProblemReq>;
+
+export const updateProblemReq = z.object({
+    problemSlug: z.string(),
+    problemStatement: z.string(),
+});

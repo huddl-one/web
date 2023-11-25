@@ -4,18 +4,18 @@ import { Problem } from "@web/app/(app)/problems/page";
 
 
 import {
-    Card,
-    MultiSelect,
-    MultiSelectItem,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeaderCell,
-    TableRow,
-    TextInput
+  Card,
+  MultiSelect,
+  MultiSelectItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+  TextInput
 } from "@tremor/react";
-import { BarChart2, SearchIcon } from "lucide-react";
+import { BarChart2, CheckCircle2, Circle, SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { Suspense, useState } from "react";
 import { Badge } from "../ui/badge";
@@ -87,7 +87,7 @@ function Problems({
             .filter((item) => isProblemSelected(item))
             .map((item) => (
               <TableRow key={item.id}>
-                {/* <TableCell className="text-center">{item.done ? (<Circle />) : (<CheckCircle2 className="stroke-green-500"/>)}</TableCell> */}
+                <TableCell className="text-center">{!item.solved ? (<Circle />) : (<CheckCircle2 className="stroke-green-500"/>)}</TableCell>
                 <TableCell className="truncate hover:text-clip"><Link href={"/problems/" + item.slug}>{item.title}</Link></TableCell>
                 <TableCell className="text-center">
                 <Badge className={`bg-${colors[item.difficulty]}-200 text-${colors[item.difficulty]}-500 hover:bg-${colors[item.difficulty]}-200`}>
@@ -96,7 +96,7 @@ function Problems({
               </TableCell>
               <TableCell>
                 {/* Random percentage */}
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center justify-center space-x-2">
                   <BarChart2 className="w-4 h-4" />
                   <span className="text-sm text-muted-foreground">
                     69%

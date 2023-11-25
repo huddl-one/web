@@ -3,9 +3,7 @@ import { TRPCError } from "@trpc/server";
 
 import { db } from "@huddl/db";
 
-import { toPusherKey } from "@huddl/utils";
 import { customHmset } from "@web/lib/helpers/custom-hmset";
-import { pusherServer } from "@web/lib/pusher";
 import { redis } from "@web/lib/redis";
 import { addFriendValidator } from "@web/lib/validations/add-friend";
 import { privateProcedure, router } from "../trpc";
@@ -99,7 +97,7 @@ export const friendRouter = router({
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to create friend request" });
     }
 
-    pusherServer.trigger(toPusherKey(`user:${friend.id}:friend_requests`), "friend_requests", {senderName: user.given_name + " " + user.family_name, senderUsername: cachedUser.username});
+    // pusherServer.trigger(toPusherKey(`user:${friend.id}:friend_requests`), "friend_requests", {senderName: user.given_name + " " + user.family_name, senderUsername: cachedUser.username});
 
     await redis.SADD(friendRequestcacheKey, cachedUser.id);
 

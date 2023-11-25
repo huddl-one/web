@@ -46,7 +46,7 @@ const Messages: FC<MessagesProps> = ({
       )
       pusherClient.unbind('incoming_message', messageHandler)
     }
-  }, [chatId])
+  }, [chatId, messages])
 
   const scrollDownRef = useRef<HTMLDivElement | null>(null)
 
@@ -91,17 +91,19 @@ const Messages: FC<MessagesProps> = ({
 
         const hasNextMessageFromSameUser =
           messages[index - 1]?.senderId === messages[index]?.senderId
+
+          const isFirstMessage = index === messages.length - 1;
         
           const isNextMessageFromDifferentDay =
           (messages[index - 1] &&
           new Date(messages[index - 1]?.timestamp || 0).toDateString() !==
-            new Date(messages[index]?.timestamp || 0).toDateString()) || index === messages.length - 1;
+            new Date(messages[index]?.timestamp || 0).toDateString());
 
         return (
           <div
             className='chat-message'
             key={`${message.id}-${message.timestamp}`}>
-            {isNextMessageFromDifferentDay && (
+            {isFirstMessage && (
             <div className="text-center text-xs my-4 font-semibold">
               <span className='p-1 px-2 bg-gray-200 rounded-lg'>{formatDate(messages[index]?.timestamp!)}</span>
             </div>
@@ -152,6 +154,11 @@ const Messages: FC<MessagesProps> = ({
                 <Icons.user className="h-4 w-4 text-zinc-900" />
               </div>
             </div>
+            {isNextMessageFromDifferentDay && (
+            <div className="text-center text-xs my-4 mt-8 font-semibold">
+              <span className='p-1 px-2 bg-gray-200 rounded-lg'>{formatDate(messages[index - 1]?.timestamp!)}</span>
+            </div>
+      )}
           </div>
         )
       })}
