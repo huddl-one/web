@@ -8,14 +8,16 @@ import {
   TabPanel,
   TabPanels
 } from "@tremor/react";
-import { Code, FileText, FlaskConical, ListTodo, Play, StickyNote, TextQuote } from "lucide-react";
+import { Code, FileText, FlaskConical, ListTodo, Loader2, Play, StickyNote, TextQuote } from "lucide-react";
 import Split from "react-split";
 import ProblemStatement from "./ProblemStatement";
 
 import { Editor as MonacoEditor } from '@monaco-editor/react';
+import { trpc } from "@web/app/_trpc/client";
 import { getLocalStorage } from "@web/lib/hooks/useLocalStorage";
 import { Editor } from "novel";
 import { useEffect, useState } from "react";
+import { Modal } from "../global/Modal";
 import { Button } from "../ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
 
@@ -31,10 +33,11 @@ interface StarterCode {
   python: string;
 }
 
-const ProblemData = ({problem}: {problem: Problem}) => {
+const ProblemData = ({problem, idx}: {problem: Problem, idx: number}) => {
+  const [index, setIndex] = useState(idx)
     return (
     <div className="px-6 overflow-auto">
-      <TabGroup>
+      <TabGroup index={index} onIndexChange={setIndex}>
         <TabList variant="solid" className="mt-4">
           <Tab icon={FileText}>Description</Tab>
           <Tab icon={FlaskConical}>Solutions</Tab>
@@ -60,7 +63,49 @@ const ProblemData = ({problem}: {problem: Problem}) => {
     )
 }
 
-const ProblemEditor = ({slug}: {slug: string}) => {
+type TestResult = {
+  input: { nums: number[] };
+  expected: boolean;
+  output: boolean;
+  passed: boolean;
+};
+
+type TestSummary = {
+  totalCases: number;
+  passedCases: number;
+};
+
+function cleanString(input: string): string {
+  return input.replace(/[\x00-\x1F\x7F-\x9F]/g, "");
+}
+
+function parseTestResults(input: string): TestResult[] {
+  const cleanedInput = cleanString(input);
+  try {
+      return JSON.parse(cleanedInput);
+  } catch (error) {
+      console.error("Failed to parse the input string to JSON:", error);
+      return [];
+  }
+}
+
+function summarizeTestCases(testResults: TestResult[]): TestSummary {
+  const summary = testResults.reduce(
+      (acc, result) => {
+          acc.totalCases += 1;
+          if (result.passed) {
+              acc.passedCases += 1;
+          }
+          return acc;
+      },
+      { totalCases: 0, passedCases: 0 } as TestSummary
+  );
+
+  return summary;
+}
+
+
+const ProblemEditor = ({slug, setIndex}: {slug: string, setIndex: React.Dispatch<React.SetStateAction<number>>}) => {
     const [editorLanguage, setEditorLanguage] = useState('javascript')
     const [code, setCode] = useState<EditorCode>({code: ''})
 
@@ -84,6 +129,33 @@ const ProblemEditor = ({slug}: {slug: string}) => {
         localStorage.setItem(key, JSON.stringify({ code: value }));
     }
   }
+
+  const [problemRun, setProblemRun] = useState(false);
+  const [testResults, setTestResults] = useState<TestResult[]>([]);
+  const [success, setSuccess] = useState(false);
+  const [errorSuccess, setErrorSuccess] = useState(false);
+
+  const runCodeMutation = trpc.problem.runCode.useMutation({
+    onSuccess: (data) => {
+      console.log(data);
+      if (data !== `{"testResults":null}`) {
+        const testResults = parseTestResults(data);
+        console.log(testResults);
+        setTestResults(testResults);
+        const summary = summarizeTestCases(testResults);
+        setSuccess(summary.passedCases === summary.totalCases)
+        setErrorSuccess(false);
+      }
+      else {
+        setSuccess(false);
+        setErrorSuccess(true);
+      }
+      setProblemRun(true);
+    },
+    onError: (error) => {
+      console.log(error);
+    }
+  });
       
 
     return (
@@ -112,9 +184,20 @@ const ProblemEditor = ({slug}: {slug: string}) => {
             </SelectContent>
           </Select>
 
+          {problemRun && (
+        <Modal toClose={setProblemRun} popupTitle={success ? "Congratulations" : "Try Again"} popupDescription="Summary of output" popupCTA="Done" popupCTAHandler={() => {setProblemRun(false)}}>
+          {/* Modal Form */}
+
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2">
+                {errorSuccess ? `Error! Pls try again` : `Number of test cases passed: ${summarizeTestCases(testResults).passedCases} out of ${summarizeTestCases(testResults).totalCases}`}
+              </div>
+            </div>
+        </Modal>)}
+
           <div className="flex items-center gap-2">
-            <Button variant={"outline"}><Play className="h-3 w-3 mr-2" />Run</Button>
-            <Button>Submit</Button>
+            <Button disabled={runCodeMutation.isLoading} variant={"outline"} onClick={() => runCodeMutation.mutate({slug: slug ,language: editorLanguage, ...getLocalStorage(slug + '-editorValue-' + editorLanguage) as unknown as EditorCode})}>{runCodeMutation.isLoading? <Loader2 className="animate-spin h-3 w-3 mr-2" /> : <Play className="h-3 w-3 mr-2" />}Run</Button>
+            {/* <Button>Submit</Button> */}
           </div>
           </section>
           <MonacoEditor
@@ -186,10 +269,16 @@ const TestCases = ({problem}: {problem: Problem}) => {
               {tests.examples.map((test, index) => {
                 return(
                   <TabPanel key={index} className="pl-2 pt-2">{Object.keys(test.inputs).map((key) => (
+                    <>
                     <div key={index} className="flex flex-col gap-2 mb-4">
                       <div className="text-sm">{key} =</div>
                       <div className="bg-gray-200 rounded-md px-4 py-2">{test.inputs[key].length > 1 ? (test.inputs[key]) : test.inputs[key]}</div>
                     </div>
+                    <div className="flex flex-col gap-2 mb-4">
+                    <div className="text-sm">expected output =</div>
+                    <div className="bg-gray-200 rounded-md px-4 py-2">{test.expected}</div>
+                    </div>
+                    </>
                   )
                 )}
                 </TabPanel>
@@ -249,18 +338,20 @@ const Workspace = ({problem}: {problem: Problem}) => {
       localStorage.setItem(problem.slug + '-editorValue-c', JSON.stringify({code: starterCode.c}));
     }
 
+    const [index, setIndex] = useState(0)
+
     return (
         <Split className="flex pt-14  h-screen" minSize={400} sizes={horizontalSizes} onDragEnd={(sizes) => {
             localStorage.setItem('horizontal-split-sizes', JSON.stringify(sizes))
         }} >
-            <ProblemData problem={problem} />
+            <ProblemData problem={problem} idx={index} />
             <Split
                 className="flex flex-col"
                 direction="vertical"
                 minSize={200}
                 sizes={verticalSizes}
             >
-                <ProblemEditor slug={problem.slug}/>
+                <ProblemEditor slug={problem.slug} setIndex={setIndex}/>
                 <TestCases problem={problem} />
             </Split>
         </Split>

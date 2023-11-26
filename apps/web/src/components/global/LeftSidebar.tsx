@@ -12,7 +12,6 @@ import {
 import { trpc } from "@web/app/_trpc/client";
 import { buttonVariants } from "../ui/button";
 import Icon from "../ui/icon";
-import { useToast } from "../ui/use-toast";
 import UserAccountNav from "./UserAccountNav";
 
 interface IncomingFriendRequest {
@@ -93,8 +92,6 @@ export function LeftSidebar({ className, user }: SidebarProps) {
   const pathname = usePathname();
 
   const {data} = trpc.userDetails.getUsername.useQuery();
-
-  const { toast } = useToast();
 
   let username = data?.username;
 

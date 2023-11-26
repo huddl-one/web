@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger
+    DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger
 } from "../ui/dropdown-menu";
 import { Icons } from "./Icons";
 
@@ -75,7 +75,7 @@ const UserAccountNav = ({
                 <DropdownMenuItem asChild>
                 <div className="flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    <Link href="/profile">My Profile</Link>
+                    <Link href={"/profile/" + username}>My Profile</Link>
                     </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
