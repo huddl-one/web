@@ -273,7 +273,7 @@ acceptRequest: privateProcedure
 
     await db.chat.create({
       data: {
-        id: chatCacheKey,
+        id: chatCacheKey.split(":")[1]!,
         users: {
           connect: [
             {

@@ -23,6 +23,14 @@ interface EditorCode {
     code: string;
   }
 
+interface StarterCode {
+  c: string;
+  cpp: string;
+  java: string;
+  javascript: string;
+  python: string;
+}
+
 const ProblemData = ({problem}: {problem: Problem}) => {
     return (
     <div className="px-6 overflow-auto">
@@ -34,7 +42,7 @@ const ProblemData = ({problem}: {problem: Problem}) => {
         </TabList>
         <TabPanels>
           <TabPanel className="">
-          <ProblemStatement statement={problem.problemStatement!} />
+          <ProblemStatement slug={problem.slug} statement={problem.problemStatement!} />
           </TabPanel>
           <TabPanel>
             <div className="mt-6 flex justify-center items-center h-[50vh]">
@@ -59,7 +67,7 @@ const ProblemEditor = ({slug}: {slug: string}) => {
     useEffect(() => {
       // Load the code from localStorage when the component mounts or when editorLanguage changes
       const storedCode = getLocalStorage(slug + '-editorValue-' + editorLanguage) as unknown as EditorCode;
-      console.log(editorLanguage, storedCode);
+      // console.log(editorLanguage, storedCode);
       if (storedCode && 'code' in storedCode && storedCode.code !== "") {
         setCode(storedCode);
       } else {
@@ -146,33 +154,17 @@ const ProblemEditor = ({slug}: {slug: string}) => {
 //   }
 // }
 
-const TestCases = () => {
-  const tests: {
-    inputs: {
-      [key: string]: any;
-    };
-    expected: any;
-  }[] = [{
-    inputs: {
-      nums: [2,7,11,15],
-      target: 9,
-    },
-    expected: [0, 1]
-},
-{
-    inputs: {
-      nums: [3,2,4],
-      target: 6,
-    },
-    expected: [1,2]
-},
-{
-    inputs: {
-      nums: [3, 3],
-      target: 6,
-    },
-    expected: [0, 1]
-}]
+interface TestCase {
+  inputs: {
+    [key: string]: any;
+  };
+  expected: any;
+};
+
+
+const TestCases = ({problem}: {problem: Problem}) => {
+  const [tests, setTestCases] = useState<{examples: TestCase[]}>(JSON.parse(JSON.parse(problem.exampleTestCases!)));
+  // console.log(typeof tests, tests.examples)
     return (
         <div className="px-6 overflow-auto">
       <TabGroup>
@@ -184,19 +176,19 @@ const TestCases = () => {
 
               <TabGroup>
               <TabList variant="solid" className="mt-4">
-              {tests.map((test, index) => {
+              {tests.examples.map((test, index) => {
                 return(
                   <Tab key={index}>Test Case {index + 1}</Tab>
                 )
               })}
               </TabList>
               <TabPanels>
-              {tests.map((test, index) => {
+              {tests.examples.map((test, index) => {
                 return(
                   <TabPanel key={index} className="pl-2 pt-2">{Object.keys(test.inputs).map((key) => (
                     <div key={index} className="flex flex-col gap-2 mb-4">
                       <div className="text-sm">{key} =</div>
-                      <div className="bg-gray-200 rounded-md px-4 py-2">{test.inputs[key].length > 1 ? ("[" + test.inputs[key].join(', ') + "]") : test.inputs[key]}</div>
+                      <div className="bg-gray-200 rounded-md px-4 py-2">{test.inputs[key].length > 1 ? (test.inputs[key]) : test.inputs[key]}</div>
                     </div>
                   )
                 )}
@@ -225,9 +217,36 @@ const Workspace = ({problem}: {problem: Problem}) => {
     let verticalSizes: any = localStorage.getItem('vertical-split-sizes')
 
     if (verticalSizes) {
-        verticalSizes = JSON.parse(verticalSizes)
+      verticalSizes = JSON.parse(verticalSizes)
     } else {
-        verticalSizes = [60, 40] // default sizes
+      verticalSizes = [60, 40] // default sizes
+    }
+
+    let starterCode = JSON.parse(problem.starterCode!) as StarterCode
+
+    const javascriptEditorValue = getLocalStorage(problem.slug + '-editorValue-javascript');
+    if (javascriptEditorValue === undefined || Object.keys(javascriptEditorValue).length === 0) {
+      localStorage.setItem(problem.slug + '-editorValue-javascript', JSON.stringify({code: starterCode.javascript}));
+    }
+
+    const pythonEditorValue = getLocalStorage(problem.slug + '-editorValue-python');
+    if (pythonEditorValue === undefined || Object.keys(pythonEditorValue).length === 0) {
+      localStorage.setItem(problem.slug + '-editorValue-python', JSON.stringify({code: starterCode.python}));
+    }
+
+    const javaEditorValue = getLocalStorage(problem.slug + '-editorValue-java');
+    if (javaEditorValue === undefined || Object.keys(javaEditorValue).length === 0) {
+      localStorage.setItem(problem.slug + '-editorValue-java', JSON.stringify({code: starterCode.java}));
+    }
+
+    const cppEditorValue = getLocalStorage(problem.slug + '-editorValue-cpp');
+    if (cppEditorValue === undefined || Object.keys(cppEditorValue).length === 0) {
+      localStorage.setItem(problem.slug + '-editorValue-cpp', JSON.stringify({code: starterCode.cpp}));
+    }
+
+    const cEditorValue = getLocalStorage(problem.slug + '-editorValue-c');
+    if (cEditorValue === undefined || Object.keys(cEditorValue).length === 0) {
+      localStorage.setItem(problem.slug + '-editorValue-c', JSON.stringify({code: starterCode.c}));
     }
 
     return (
@@ -242,7 +261,7 @@ const Workspace = ({problem}: {problem: Problem}) => {
                 sizes={verticalSizes}
             >
                 <ProblemEditor slug={problem.slug}/>
-                <TestCases />
+                <TestCases problem={problem} />
             </Split>
         </Split>
     );

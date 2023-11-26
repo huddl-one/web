@@ -17,23 +17,23 @@ export default async function RootLayout({
     children: React.ReactNode;
 }) {
     const { getUser } = getKindeServerSession();
-  const user = getUser();
+    const user = getUser();
 
-  //  Checking whether the user is logged in
-  if (!user || !user.id) {
-    redirect("/auth-callback?origin=problems");
-  }
+    //  Checking whether the user is logged in
+    if (!user || !user.id) {
+        redirect("/auth-callback?origin=problems");
+    }
 
-  //  Checking whether the user is synced to db
-  const dbuser = await db.user.findUnique({
-    where: {
-      id: user.id,
-    },
-  });
+    //  Checking whether the user is synced to db
+    const dbuser = await db.user.findUnique({
+        where: {
+            id: user.id,
+        },
+    });
 
-  if (!dbuser) {
-    redirect("/auth-callback?origin=problems");
-  }
+    if (!dbuser) {
+        redirect("/auth-callback?origin=problems");
+    }
 
     return (
         <WidthWrapper>

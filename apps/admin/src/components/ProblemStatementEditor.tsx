@@ -92,14 +92,6 @@ const ProblemEditor = ({slug}: {slug: string}) => {
 
 const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:ProblemStatementEditorProps) => {
 
-  function handleEditorChange(value:string | undefined, event: any) {
-    let key = slug+'editorValue'
-
-    // save to localstorage
-    if (value !== undefined) {
-      localStorage.setItem(key, JSON.stringify({code: value}));
-    }
-  }
   
   function handleExamplesEditorChange(value:string | undefined, event: any) {
     let key = slug+'examples'
@@ -254,7 +246,7 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
         <MonacoEditor
           height="30vh"
           defaultLanguage="javascript"
-          defaultValue={((getLocalStorage(slug+'examples') as unknown as EditorCode).code)}
+          defaultValue={((getLocalStorage(slug+'examples') as unknown as EditorCode).code ?? "")}
           onChange={handleExamplesEditorChange}
         />
       </CardContent>
@@ -265,7 +257,7 @@ const ProblemStatementEditor = ({slug, problemTitle, problemDiff, isPublic}:Prob
       <MonacoEditor
           height="30vh"
           defaultLanguage="javascript"
-          defaultValue={((getLocalStorage(slug+'testCases') as unknown as EditorCode).code)}
+          defaultValue={((getLocalStorage(slug+'testCases') as unknown as EditorCode).code ?? "")}
           onChange={handleTestCasesEditorChange}
         />
       </CardContent>

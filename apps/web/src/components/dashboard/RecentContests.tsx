@@ -1,82 +1,83 @@
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+
+interface PositionIndicatorProps {
+    position: number;
+};
+
+const PositionIndicator: React.FC<PositionIndicatorProps> = ({ position }) => {
+    // Function to determine the color based on the position
+    const getColor = (pos: number): string => {
+        switch (pos) {
+            case 1: return 'bg-yellow-400 text-white'; // Assuming you have custom classes like bg-gold, bg-silver, etc.
+            case 2: return 'bg-slate-500 text-white';
+            case 3: return 'bg-orange-800 text-white';
+            default: return 'bg-gray-200'; // Default color for positions other than 1, 2, 3
+        }
+    };
+
+    return (
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getColor(position)}`}>
+            <span className="font-semibold">{position}</span>
+        </div>
+    );
+};
 
 export function RecentContests() {
     return (
         <div className="space-y-8">
             <div className="flex items-center">
-                <Avatar className="h-9 w-9">
-                    <AvatarImage src="/avatars/01.png" alt="Avatar" />
-                    <AvatarFallback>OM</AvatarFallback>
-                </Avatar>
+                <PositionIndicator position={4} />
                 <div className="ml-4 space-y-1">
                     <p className="text-sm font-medium leading-none">
-                        Olivia Martin
+                        Contest on 25th Nov
                     </p>
                     <p className="text-sm text-muted-foreground">
-                        olivia.martin@email.com
+                        with @jacksonlee, @isabellanguyen,...
                     </p>
                 </div>
-                <div className="ml-auto font-medium">+$1,999.00</div>
             </div>
             <div className="flex items-center">
-                <Avatar className="flex h-9 w-9 items-center justify-center space-y-0 border">
-                    <AvatarImage src="/avatars/02.png" alt="Avatar" />
-                    <AvatarFallback>JL</AvatarFallback>
-                </Avatar>
+                <PositionIndicator position={3} />
                 <div className="ml-4 space-y-1">
                     <p className="text-sm font-medium leading-none">
-                        Jackson Lee
+                        Contest on 23rd Nov
                     </p>
                     <p className="text-sm text-muted-foreground">
-                        jackson.lee@email.com
+                        with @sofiadavis, @williamkim,...
                     </p>
                 </div>
-                <div className="ml-auto font-medium">+$39.00</div>
             </div>
             <div className="flex items-center">
-                <Avatar className="h-9 w-9">
-                    <AvatarImage src="/avatars/03.png" alt="Avatar" />
-                    <AvatarFallback>IN</AvatarFallback>
-                </Avatar>
+                <PositionIndicator position={1} />
                 <div className="ml-4 space-y-1">
                     <p className="text-sm font-medium leading-none">
-                        Isabella Nguyen
+                        Contest on 20th Nov
                     </p>
                     <p className="text-sm text-muted-foreground">
-                        isabella.nguyen@email.com
+                        with @isabellanguyen, @jacksonlee,...
                     </p>
                 </div>
-                <div className="ml-auto font-medium">+$299.00</div>
             </div>
             <div className="flex items-center">
-                <Avatar className="h-9 w-9">
-                    <AvatarImage src="/avatars/04.png" alt="Avatar" />
-                    <AvatarFallback>WK</AvatarFallback>
-                </Avatar>
+                <PositionIndicator position={6} />
                 <div className="ml-4 space-y-1">
                     <p className="text-sm font-medium leading-none">
-                        William Kim
+                        Contest on 19th Nov
                     </p>
                     <p className="text-sm text-muted-foreground">
-                        will@email.com
+                        with @williamkim, @sofiadavis,...
                     </p>
                 </div>
-                <div className="ml-auto font-medium">+$99.00</div>
             </div>
             <div className="flex items-center">
-                <Avatar className="h-9 w-9">
-                    <AvatarImage src="/avatars/05.png" alt="Avatar" />
-                    <AvatarFallback>SD</AvatarFallback>
-                </Avatar>
+                <PositionIndicator position={2} />
                 <div className="ml-4 space-y-1">
                     <p className="text-sm font-medium leading-none">
-                        Sofia Davis
+                        Contest on 18th Nov
                     </p>
                     <p className="text-sm text-muted-foreground">
-                        sofia.davis@email.com
+                        with @jacksonlee, @isabellanguyen,...
                     </p>
                 </div>
-                <div className="ml-auto font-medium">+$39.00</div>
             </div>
         </div>
     );

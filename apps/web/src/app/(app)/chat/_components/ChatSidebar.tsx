@@ -75,7 +75,7 @@ function ChatSidebar({chats}: {chats: any[]}) {
         </Avatar>
                             <div className="flex flex-col">
                                 <p className="text-sm font-semibold">{`${item.firstName} ${item.lastName}`}</p>
-                                <p className="text-xs text-gray-500">{JSON.parse(item.lastMessage).text}</p>
+                                <p className="text-xs text-gray-500">{item.lastMessage === undefined ? "Start Chatting" : JSON.parse(item.lastMessage).text}</p>
                             </div>
                         </div>
                     )}

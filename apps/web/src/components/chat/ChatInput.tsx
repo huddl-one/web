@@ -36,7 +36,7 @@ export const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
     },
   })
 
-  const sendMessage = async () => {
+  const sendMessage = () => {
     if(!input) return
     setIsLoading(true)
 

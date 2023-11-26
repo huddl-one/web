@@ -19,7 +19,7 @@ export default async function RootLayout({
 
     //  Checking whether the user is logged in
     if (!user || !user.id) {
-        redirect("/auth-callback?origin=friends");
+        redirect("/auth-callback?origin=problems");
     }
 
     //  Checking whether the user is synced to db
@@ -30,7 +30,7 @@ export default async function RootLayout({
     });
 
     if (!dbuser) {
-        redirect("/auth-callback?origin=friends");
+        redirect("/auth-callback?origin=problems");
     }
 
     return (

@@ -175,7 +175,7 @@ const Dashboard = () => {
                             <PartyPopper className="h-4 w-4 text-primary" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">80%</div>
+                            <div className="text-2xl font-bold">71%</div>
                             <p className="text-xs text-muted-foreground">
                                 +8.1% from last month
                             </p>

@@ -1,9 +1,9 @@
+import MaxWidthWrapper from "@admin/components/MaxWidthWrapper";
+import { buttonVariants } from "@admin/components/ui/button";
 import {
   getKindeServerSession,
   RegisterLink,
 } from "@kinde-oss/kinde-auth-nextjs/server";
-import MaxWidthWrapper from "@admin/components/MaxWidthWrapper";
-import { buttonVariants } from "@admin/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
@@ -25,7 +25,7 @@ export default function Home() {
           </p>
         </div>
         <h1 className="max-w-4xl text-5xl font-bold md:text-6xl lg:text-7xl">
-          Code with your <span className="text-violet-600">frands</span> in
+          Code with your <span className="text-violet-600">friends</span> in
           seconds.
         </h1>
         <p className="mt-5 max-w-prose text-zinc-700 sm:text-lg">
